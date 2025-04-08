@@ -1,10 +1,51 @@
-
+* {
+    justify-content: center;
+    text-align: center;
+    font-size: 16px;
+    font-family: "Lato", "Pretendard", "Noto-Sans", "NanumGothic", sans-serif;
+}
 
 h1 {
-    font-family: "Lato", "Pretendard", "Noto-Sans", "NanumGothic", sans-serif;
     font-size: 2em;
     color: #003876;
     text-align: center;
     padding: 10px;
 }
 
+form {
+    justify-self: center;
+    width: 60%;
+    border-style: solid;
+    border-color: grey;
+    border-width: 2px;
+    padding: 5px;
+    margin: 10px;
+
+}
+
+
+.form-question form-input {
+    width: 180px;
+}
+
+input {
+    width: 180px;
+}
+
+.form-caption {
+    width: 100px;
+    text-align: left;
+}
+
+.form-question {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+}
+
+.form-question label {
+    width: 75px;
+    margin-right: 10px;
+    text-align: left;
+  }
