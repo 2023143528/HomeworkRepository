@@ -12,7 +12,7 @@
 <body>
 <h1>Welcome to<br>Internet-Programming Movie Site</h1>
 
-<a href="login.html" class="this">로그인</a> | <a href="signup.html" class="that">회원가입</a>
+<a href="login.html" class="that">로그인</a> | <a href="signup.html" class="this">회원가입</a>
 
 <br><br>
 
@@ -21,7 +21,7 @@
     
     <div class="form-question">
         <label>이름:</label>
-        <div><input type="text" name="name" required></div>
+        <div><input type="text" name="name" autocomplete="on"></div>
     </div>
 
     <div class="form-question">
@@ -31,39 +31,62 @@
 
     <div class="form-question">
         <label>성별:</label>
-        <div><input type="text" name="name" required></div>
+        <div class="checkbox-horizontal"><p>
+            <input type="radio" name="gender" value="남성" required>남성 </p>
+            <p><input type="radio" name="gender" value="여성" required>여성 </p></div>
     </div>
 
     <div class="form-question">
         <label>학년:</label>
-        <div><input type="number" name="name" required></div>
+        <div><input type="number" name="grade" step="1" min="1" max="6" required></div>
     </div>
 
     <div class="form-question">
         <label>아이디:</label>
-        <div><input type="text" name="name" required></div>
+        <div><input type="text" name="id" autofocus ></div>
     </div>
 
     <div class="form-question">
         <label>비밀번호:</label>
-        <div><input type="text" name="name" required></div>
+        <div><input type="password" name="password" required></div>
     </div>
 
     <div class="form-question">
         <label>이메일:</label>
-        <div><input type="text" name="name" required></div>
+        <div><input type="email" name="email" placeholder="username@company.com"></div>
     </div>
 
     <div class="form-question">
         <label>보안 질문:</label>
-        <div><input type="text" name="name" required></div>
+        <div><select name="security-question">
+            <option>다니는 대학교는?</option>
+            <option>좋아하는 동물은?</option>
+            <option>좋아하는 과일은?</option>
+        </select></div>
     </div>
 
     <div class="form-question">
         <label>답변:</label>
-        <div><input type="text" name="name" required></div>
+        <div><input type="text" name="security-answer" list="security-answers" autocomplete></div>
+        <datalist id="security-answers">
+            <option value="서울대학교">
+            <option value="연세대학교">
+            <option value="고려대학교">
+            <option value="토끼">
+            <option value="곰">
+            <option value="강아지">
+            <option value="고양이">
+            <option value="사과">
+            <option value="포도">
+            <option value="복숭아">
+        </datalist>
     </div>
 
+    <br>
+
+
+    <input type="submit" value="Signup" id="submit" class="last-buttons">
+    <input type="reset" value="Cancel" id="cancel" class="last-buttons">
 
 
 </form>
