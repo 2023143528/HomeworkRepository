@@ -186,7 +186,7 @@ nav.nav-container {
     opacity: 0;
     transition: opacity 0.25s ease;
   }
-  
+
 
 .movie-img-container:hover {
     transform: scale(2, 2);
