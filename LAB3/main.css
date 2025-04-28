@@ -164,13 +164,14 @@ nav.nav-container {
     box-sizing: border-box;
 }
 
-/* 1) 부모 컨테이너를 기준 잡기 */
+
 .movie-img-container {
     position: relative;
     display: inline-block;
+    transition: transform 2s;
   }
   
-  .movie-img-container .overlay {
+.movie-img-container .overlay {
     position: absolute;
     top: 0; left: 0;
     width: 100px; height: 100px;
@@ -178,7 +179,7 @@ nav.nav-container {
     justify-content: center;
     align-items: center;
   
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.3);
     color: #fff;
     font-size: 14px;
   
@@ -186,10 +187,16 @@ nav.nav-container {
     transition: opacity 0.25s ease;
   }
   
-  /* 3) hover 시에만 나타나게 */
-  .movie-img-container:hover .overlay {
-    opacity: 1;
-  }
+
+.movie-img-container:hover {
+    transform: scale(2, 2);
+
+    .overlay {
+        opacity: 1;
+      }
+}
+
+
 
 
 @media (max-width: 800px) {
