@@ -22,117 +22,89 @@
 <hr style="border: none; height: 1px; background-color: black;">
 <br><br>
 
+
 <div class="flex-vertical">
-<div class="title-and-contents">
-<div class="titles">Movies</div>
-<div class="movies-flex">
-
-<div class="movie">
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="christmas-1.jpg"
-          alt="Just in Time for Christmas Poster"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Just in Time for Christmas</div>
-    </div>
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="christmas-2.jpg"
-          alt="Just in Time for Christmas Actor"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Just in Time for Christmas</div>
-    </div>
-</div>
-
-<div class="movie">
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="daddyo-1.jpg"
-          alt="Daddy-o Poster"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Daddy-o</div>
-    </div>
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="daddyo-2.jpg"
-          alt="Daddy-o Actors"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Daddy-o</div>
-    </div>
-</div>
-
-<div class="movie">
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="shawshank-1.jpg"
-          alt="Shawshank Poster"
-          width="100px" height="100px"
-        >
-        <div class="overlay">The Shawshank Redemption</div>
-    </div>
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="shawshank-2.jpg"
-          alt="Daddy-o Actors"
-          width="100px" height="100px"
-        >
-        <div class="overlay">The Shawshank Redemption</div>
-    </div>
-</div>
+      <div class="title-and-contents">
+        <div class="titles">Movies</div>
+        <div class="movies-flex">
+          
+        </div>
+      </div> 
+    </div> 
+  </div> 
 
 
 
-
-<div class="movie">
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="frankenstein-1.jpg"
-          alt="Frankenstein Poster"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Frankenstein</div>
-    </div>
-    <div class="movie-img-container">
-        <img
-          class="movie-img"
-          src="frankenstein-2.jpg"
-          alt="Frankenstein Scene"
-          width="100px" height="100px"
-        >
-        <div class="overlay">Frankenstein</div>
-    </div>
-</div>
-
-
-
-
-
-
-</div>
-</div>
-
-
-<div class="title-and-contents">
-<div class="titles">About</div>
-<div class="about">
-여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 여기는 인프밍 영화 정보 사이트! 
-</div>
-</div>
-
-</div>
-
-
-</div>
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('product.json')
+        .then(response => {
+            if (!response.ok) throw new Error('Fetch error');
+            return response.json();
+        })
+        .then(data => {
+            renderMovies(data);
+            setupSearchAndSort(data);
+        })
+        .catch(err => console.error('Error loading JSON:', err));
+});
+
+function renderMovies(movies) {
+    const container = document.querySelector('.movies-flex');
+    container.innerHTML = '';
+    movies.forEach(movie => {
+        const movieDiv = document.createElement('div');
+        movieDiv.classList.add('movie');
+        movieDiv.innerHTML = `
+            <div class="movie-img-container">
+                <img class="movie-img" src="${movie.poster_path}" alt="${movie.title}" width="100px" height="100px">
+                <div class="overlay">Overview: ${movie.overview}</div>
+            </div>
+            <p><strong>${movie.title}</strong></p>
+            <p>Rating: ${movie.vote_average}</p>
+            <p>Running time: ${movie.runtime} minuites</p>
+        `;
+        container.appendChild(movieDiv);
+    });
+}
+
+function setupSearchAndSort(allMovies) {
+    const titlesDiv = document.querySelector('.title-and-contents .titles');
+    const controls = document.createElement('div');
+    controls.innerHTML = `
+        <input type="text" id="searchInput" placeholder="영화 제목 검색" style="margin-right: 10px;" />
+        <select id="sortSelect">
+            <option value="">-- 정렬 --</option>
+            <option value="title">제목</option>
+            <option value="vote_average">평점</option>
+            <option value="runtime">러닝타임</option>
+        </select>
+    `;
+    titlesDiv.appendChild(controls);
+
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+
+    function updateView() {
+        const query = searchInput.value.toLowerCase();
+        const sortBy = sortSelect.value;
+
+        let filtered = allMovies.filter(m => m.title.toLowerCase().includes(query));
+        if (sortBy) {
+            filtered.sort((a, b) => {
+                if (sortBy === 'title') {
+                    return a.title.localeCompare(b.title);
+                } else {
+                    return a[sortBy] - b[sortBy];
+                }
+            });
+        }
+        renderMovies(filtered);
+    }
+
+    searchInput.addEventListener('input', updateView);
+    sortSelect.addEventListener('change', updateView);
+}
+</script>
 </html>
