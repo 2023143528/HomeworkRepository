@@ -26,7 +26,7 @@
     <div class="content">
       <aside class="sort-sidebar">
         <p>정렬 기준</p>
-        <label><input type="radio" name="sortOption" value="vote_average_desc"> 평점 내림차순</label>
+        <label><input type="radio" name="sortOption" value="vote_average_desc" checked> 평점 내림차순</label>
         <label><input type="radio" name="sortOption" value="vote_average_asc"> 평점 오름차순</label>
         <label><input type="radio" name="sortOption" value="runtime_desc"> 러닝타임 내림차순</label>
         <label><input type="radio" name="sortOption" value="runtime_asc"> 러닝타임 오름차순</label>
@@ -39,8 +39,8 @@
   document.addEventListener('DOMContentLoaded', () => {
     const allMovies = [];
     let filtered = [];
-    let page = 1;
-    const perPage = 20;
+    let page = 5;
+    const perPage = 4;
 
     const container    = document.querySelector('.movies-flex');
     const input        = document.getElementById('searchInput');
