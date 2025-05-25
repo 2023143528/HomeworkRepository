@@ -1,110 +1,114 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Oswald:wght@200..700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="main.css">
-    <title>인프밍 영화 정보 사이트</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <title>인프밍 영화 정보 사이트</title>
 </head>
 <body>
-<div class="width-1020">
-<h1 class="header-text">인프밍 영화 정보 사이트입니다.</h1>
+  <div class="width-1020">
+    <h1 class="header-text">인프밍 영화 정보 사이트입니다.</h1>
+    <nav class="nav-container">
+      <a href="index.html">메인페이지</a>
+      <a href="login.html">로그인</a>
+      <a href="signup.html">회원가입</a>
+    </nav>
 
-<nav class="nav-container" style="justify-content: start;">
-    <a href="index.html" class="this">메인페이지</a>
-    <a href="login.html" class="that">로그인</a>
-    <a href="signup.html" class="that">회원가입</a>
-</nav>
-<br>
-<hr style="border: none; height: 1px; background-color: black;">
-<br><br>
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="키워드를 입력하세요">
+      <button id="searchButton">Filter results</button>
+    </div>
 
+    <div class="content">
+      <aside class="sort-sidebar">
+        <p>정렬 기준</p>
+        <label><input type="radio" name="sortOption" value="vote_average_desc"> 평점 내림차순</label>
+        <label><input type="radio" name="sortOption" value="vote_average_asc"> 평점 오름차순</label>
+        <label><input type="radio" name="sortOption" value="runtime_desc"> 러닝타임 내림차순</label>
+        <label><input type="radio" name="sortOption" value="runtime_asc"> 러닝타임 오름차순</label>
+      </aside>
+      <div class="movies-flex"></div>
+    </div>
+  </div>
 
-<div class="flex-vertical">
-      <div class="title-and-contents">
-        <div class="titles">Movies</div>
-        <div class="movies-flex">
-          
-        </div>
-      </div> 
-    </div> 
-  </div> 
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const allMovies = [];
+    let filtered = [];
+    let page = 1;
+    const perPage = 20;
 
+    const container    = document.querySelector('.movies-flex');
+    const input        = document.getElementById('searchInput');
+    const button       = document.getElementById('searchButton');
+    const radios       = Array.from(document.getElementsByName('sortOption'));
 
-
-</body>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+    // 데이터 로드
     fetch('product.json')
-        .then(response => {
-            if (!response.ok) throw new Error('Fetch error');
-            return response.json();
-        })
-        .then(data => {
-            renderMovies(data);
-            setupSearchAndSort(data);
-        })
-        .catch(err => console.error('Error loading JSON:', err));
-});
+      .then(res => res.ok ? res.json() : Promise.reject('Fetch error'))
+      .then(data => {
+        allMovies.push(...data);
+        filtered = [...allMovies];
+        renderPage();
+      })
+      .catch(err => console.error(err));
 
-function renderMovies(movies) {
-    const container = document.querySelector('.movies-flex');
-    container.innerHTML = '';
-    movies.forEach(movie => {
-        const movieDiv = document.createElement('div');
-        movieDiv.classList.add('movie');
-        movieDiv.innerHTML = `
-            <div class="movie-img-container">
-                <img class="movie-img" src="${movie.poster_path}" alt="${movie.title}" width="100px" height="100px">
-                <div class="overlay">Overview: ${movie.overview}</div>
-            </div>
-            <p><strong>${movie.title}</strong></p>
-            <p>Rating: ${movie.vote_average}</p>
-            <p>Running time: ${movie.runtime} minuites</p>
+    // 한 페이지 렌더링
+    function renderPage() {
+      if (page === 1) container.innerHTML = '';
+      const start = (page - 1) * perPage;
+      const end   = page * perPage;
+      filtered.slice(start, end).forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'movie';
+        div.innerHTML = `
+          <div class="movie-img-container">
+            <img src="${m.poster_path}" alt="${m.title}">
+            <div class="overlay">${m.overview}</div>
+          </div>
+          <p><strong>${m.title}</strong></p>
+          <p>Rating: ${m.vote_average}</p>
+          <p>Running time: ${m.runtime}분</p>
         `;
-        container.appendChild(movieDiv);
-    });
-}
-
-function setupSearchAndSort(allMovies) {
-    const titlesDiv = document.querySelector('.title-and-contents .titles');
-    const controls = document.createElement('div');
-    controls.innerHTML = `
-        <input type="text" id="searchInput" placeholder="영화 제목 검색" style="margin-right: 10px;" />
-        <select id="sortSelect">
-            <option value="">-- 정렬 --</option>
-            <option value="title">제목</option>
-            <option value="vote_average">평점</option>
-            <option value="runtime">러닝타임</option>
-        </select>
-    `;
-    titlesDiv.appendChild(controls);
-
-    const searchInput = document.getElementById('searchInput');
-    const sortSelect = document.getElementById('sortSelect');
-
-    function updateView() {
-        const query = searchInput.value.toLowerCase();
-        const sortBy = sortSelect.value;
-
-        let filtered = allMovies.filter(m => m.title.toLowerCase().includes(query));
-        if (sortBy) {
-            filtered.sort((a, b) => {
-                if (sortBy === 'title') {
-                    return a.title.localeCompare(b.title);
-                } else {
-                    return a[sortBy] - b[sortBy];
-                }
-            });
-        }
-        renderMovies(filtered);
+        container.appendChild(div);
+      });
     }
 
-    searchInput.addEventListener('input', updateView);
-    sortSelect.addEventListener('change', updateView);
-}
-</script>
+    // 검색·정렬 적용
+    function updateView() {
+      const q = input.value.trim().toLowerCase();
+      filtered = allMovies.filter(m => m.title.toLowerCase().includes(q));
+
+      const sel = radios.find(r => r.checked);
+      if (sel) {
+        const [, key, dir] = sel.value.match(/(vote_average|runtime)_(asc|desc)/);
+        filtered.sort((a, b) => {
+          const av = parseFloat(a[key]), bv = parseFloat(b[key]);
+          return dir === 'asc' ? av - bv : bv - av;
+        });
+      }
+
+      page = 1;
+      renderPage();
+    }
+
+    button.addEventListener('click', e => { e.preventDefault(); updateView(); });
+    radios.forEach(r => r.addEventListener('change', updateView));
+
+    // 무한 스크롤
+    window.addEventListener('scroll', () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
+          && page * perPage < filtered.length) {
+        page++;
+        renderPage();
+      }
+    });
+
+  });
+  </script>
+</body>
 </html>
