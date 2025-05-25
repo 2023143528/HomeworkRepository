@@ -27,10 +27,7 @@ body {
   padding: 0 10px;
   margin-bottom: 10px;
 }
-.nav-container a {
-  text-decoration: none;
-  color: #003876;
-}
+
 
 .controls {
   display: flex;
