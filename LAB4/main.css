@@ -139,10 +139,16 @@ form {
 
 .this {
     color: black;
+    border-top: 3px solid red;
+    border-bottom: 3px solid red;
+    padding: 5px 10px;
+    text-decoration: none;
 }
 
 .that {
-    color: blue;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
 }
 
 
