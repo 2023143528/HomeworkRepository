@@ -39,22 +39,25 @@
 document.addEventListener('DOMContentLoaded', () => {
   const allMovies = [];
   let filtered = [];
-  let page = 1;
+  let page = 1;           // ← 5 → 1로 변경
   const perPage = 4;
 
   const container = document.querySelector('.movies-flex');
-  const input = document.getElementById('searchInput');
-  const button = document.getElementById('searchButton');
-  const radios = Array.from(document.getElementsByName('sortOption'));
+  const input     = document.getElementById('searchInput');
+  const button    = document.getElementById('searchButton');
+  const radios    = Array.from(document.getElementsByName('sortOption'));
 
+  // 데이터 로드
   fetch('product.json')
     .then(res => res.ok ? res.json() : Promise.reject('Fetch error'))
     .then(data => {
       allMovies.push(...data);
-      updateView();  
+      filtered = [...allMovies];
+      renderPage();
     })
     .catch(err => console.error(err));
 
+  // 한 페이지 렌더링
   function renderPage() {
     if (page === 1) container.innerHTML = '';
     const start = (page - 1) * perPage;
@@ -68,13 +71,14 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="overlay">${m.overview}</div>
         </div>
         <p><strong>${m.title}</strong></p>
-        <p>평점: ${m.vote_average}</p>
-        <p>러닝타임: ${m.runtime}분</p>
+        <p>Rating: ${m.vote_average}</p>
+        <p>Running time: ${m.runtime}분</p>
       `;
       container.appendChild(div);
 
+      // JS로 overlay 보이기/숨기기
       const imgContainer = div.querySelector('.movie-img-container');
-      const overlay = imgContainer.querySelector('.overlay');
+      const overlay      = imgContainer.querySelector('.overlay');
       imgContainer.addEventListener('mouseenter', () => {
         overlay.style.opacity = '1';
       });
@@ -84,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 검색·정렬 적용
   function updateView() {
     const q = input.value.trim().toLowerCase();
     filtered = allMovies.filter(m => m.title.toLowerCase().includes(q));
@@ -104,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
   button.addEventListener('click', e => { e.preventDefault(); updateView(); });
   radios.forEach(r => r.addEventListener('change', updateView));
 
+  // 무한 스크롤
   window.addEventListener('scroll', () => {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
         && page * perPage < filtered.length) {
