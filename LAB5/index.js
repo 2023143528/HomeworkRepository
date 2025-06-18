@@ -2,6 +2,11 @@ const express = require('express');
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const app = express();
+const fs = require('fs');
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 async function getDBConnection() {
     const db = await sqlite.open({
@@ -61,28 +66,85 @@ app.get('/api/movies', async (req, res) => {
 });
 
 
-app.get('/api/movies/:movie_id', async (req, res) => {
+app.get('/movies/:movie_id', async (req, res) => {
   try {
+    const movieId = Number(req.params.movie_id);
+
     const db = await getDBConnection();
-    const { movie_id } = req.params;
     const movie = await db.get(
       `SELECT movie_id, movie_image, movie_title,
               movie_overview, movie_release_date, movie_rate
-       FROM movies
-       WHERE movie_id = ?`,
-       movie_id
+       FROM movies WHERE movie_id = ?`,
+      movieId
     );
     await db.close();
-    if (!movie) return res.status(404).json({ error: 'Not found' });
-    res.json(movie);
+    if (!movie) {
+      return res.status(404).send('영화를 찾을 수 없습니다.');
+    }
+
+    const commentsRaw = fs.readFileSync(__dirname + '/public/comments.json', 'utf-8');
+    const allComments = JSON.parse(commentsRaw);
+    const comments = allComments.filter(c => c.movie_id === movieId);
+
+    let html = fs.readFileSync(__dirname + '/public/movie_detail.html', 'utf-8');
+
+    const movieInfoHTML = `
+    <div id="movie-info">
+        <div id="movie-info-image">
+            <img src="/${movie.movie_image}" alt="${movie.movie_title}" width="200" height="300">
+        </div>
+        <div id="movie-info-details">
+            <p><strong>영화 ID</strong>: ${movie.movie_id}</p>
+            <section class="movie-info-title">${movie.movie_title}</section>
+            <p><strong>개봉일</strong>: ${movie.movie_release_date}</p>
+            <p><strong>평점</strong>: ${movie.movie_rate}</p>
+            <p><strong>줄거리</strong>: ${movie.movie_overview}</p>
+        </div>
+    </div>
+    `;
+
+    const commentListHTML = `
+    <div id="comments">  
+    <section class="movie-info-title">영화 후기</section>
+      <ul id="comment-list">
+        ${comments.map(c => `<li>${c.text}</li>`).join('\n')}
+      </ul>
+      <form id="comment-form" method="POST" action="/movies/${movieId}/comments">
+        <textarea name="text" placeholder="후기를 남겨주세요"></textarea>
+        <button type="submit">등록</button>
+      </form>
+    </div>
+    `;
+
+    html = html
+      .replace('<!-- MOVIE_INFO -->', movieInfoHTML)
+      .replace('<!-- COMMENT_LIST -->', commentListHTML);
+
+    res.send(html);
+
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    res.status(500).send('서버 오류');
   }
 });
 
 
-app.get('/movies/:movie_id', (req, res) => {
-  res.sendFile(__dirname + '/public/movie_detail.html');
+app.post('/movies/:movie_id/comments', (req, res) => {
+  try {
+    const movieId = Number(req.params.movie_id);
+    const text = req.body.text || '';
+    const commentsPath = __dirname + '/public/comments.json';
+
+    const commentsRaw = fs.readFileSync(commentsPath, 'utf-8');
+    const comments = JSON.parse(commentsRaw);
+    comments.push({ movie_id: movieId, text });
+
+    fs.writeFileSync(commentsPath, JSON.stringify(comments, null, 2), 'utf-8');
+    res.redirect(`/movies/${movieId}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('댓글 저장 실패');
+  }
 });
 
 
