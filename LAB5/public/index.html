@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
+  <title>인프밍 영화 정보 사이트</title>
+</head>
+<body>
+  <div class="width-1020">
+    <h1 class="header-text">인프밍 영화 정보 사이트입니다.</h1>
+    <nav class="nav-container">
+      <a href="/" class="this">메인페이지</a>
+      <a href="/login" class="that" >로그인</a>
+      <a href="/signup" class="that">회원가입</a>
+    </nav>
+
+    <div class="controls">
+      <input type="text" id="searchInput" placeholder="키워드를 입력하세요">
+      <button id="searchButton">Filter results</button>
+    </div>
+
+    <div class="content">
+      <aside class="sort-sidebar">
+        <p>정렬 기준</p>
+        <label><input type="radio" name="sortOption" value="rating_desc" checked> 평점 내림차순</label>
+        <label><input type="radio" name="sortOption" value="rating_asc"> 평점 오름차순</label>
+        <label><input type="radio" name="sortOption" value="open_desc"> 개봉 내림차순</label>
+        <label><input type="radio" name="sortOption" value="open_asc"> 개봉 오름차순</label>
+      </aside>
+      <div class="movies-flex"></div>
+    </div>
+  </div>
+
+  <script>
+  const allMovies = [];
+  let filtered = [];
+  let page = 1;
+  const perPage = 20;
+
+  const container = document.querySelector('.movies-flex');
+  const input = document.getElementById('searchInput');
+  const button = document.getElementById('searchButton');
+  const radios = Array.from(document.getElementsByName('sortOption'));
+
+  function renderPage() {
+    if (page === 1) container.innerHTML = '';
+    const start = (page - 1) * perPage;
+    const end   = page * perPage;
+    filtered.slice(start, end).forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'movie';
+      div.innerHTML = `
+        <div class="movie-img-container">
+          <img src="${m.movie_image}" alt="${m.movie_title}">
+          <div class="overlay">${m.movie_overview}</div>
+        </div>
+        <p><strong>${m.movie_title}</strong></p>
+        <p>평점: ${m.movie_rate}</p>
+        <p>개봉: ${m.movie_release_date}</p>
+      `;
+      div.addEventListener('click', () => {
+        window.location.href = `/movies/${m.movie_id}`;
+      });
+      container.appendChild(div);
+
+      const imgContainer = div.querySelector('.movie-img-container');
+      const overlay = imgContainer.querySelector('.overlay');
+      imgContainer.addEventListener('mouseenter', () => {
+        overlay.style.opacity = '1';
+      });
+      imgContainer.addEventListener('mouseleave', () => {
+        overlay.style.opacity = '0';
+      });
+    });
+  }
+
+  function loadMoviesAJAX(q, sortOption) {
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    params.append('sortOption', sortOption);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/api/movies?${params}`, true);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        const movies = JSON.parse(xhr.responseText);
+        allMovies.length = 0;
+        allMovies.push(...movies);
+        filtered = [...allMovies];
+        page = 1;
+        renderPage();
+      }
+    };
+    xhr.send();
+  }
+
+
+
+  function updateView() {
+    const q = input.value.trim();
+    const sortOption = radios.find(r => r.checked).value;
+    loadMoviesAJAX(q, sortOption);
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateView();
+    button.addEventListener('click', e => { e.preventDefault(); updateView(); });
+    radios.forEach(r => r.addEventListener('change', updateView));
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,300;0,400;0,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/main.css">
+  <title>인프밍 영화 정보 사이트</title>
+</head>
+<body>
+  <div class="width-1020">
+    <h1 class="header-text">인프밍 영화 정보 사이트입니다.</h1>
+    <nav class="nav-container">
+      <a href="/" class="this">메인페이지</a>
+      <a href="/login" class="that" >로그인</a>
+      <a href="/signup" class="that">회원가입</a>
+    </nav>
+
+    <section id="movie-info"></section>
+
+    <h3>영화 후기</h3>
+    <ul id="comment-list"></ul>
+
+    <form id="comment-form">
+      <textarea id="comment-input" placeholder="후기를 남겨주세요"></textarea>
+      <button type="submit">등록</button>
+    </form>
+
+  </div>
+
+  <script>
+  const allMovies = [];
+  let filtered = [];
+  let page = 1;
+  const perPage = 1;
+
+  const container = document.querySelector('#movie-info');
+
+  function renderPage() {
+    if (page === 1) container.innerHTML = '';
+    const start = (page - 1) * perPage;
+    const end   = page * perPage;
+    filtered.slice(start, end).forEach(m => {
+      const div = document.createElement('div');
+      div.className = 'movie';
+      div.innerHTML = `
+        <div class="movie-img-container">
+        <p>영화 ID: ${m.movie_id}</p>
+          <img src="${m.movie_image}" alt="${m.movie_title}">
+          <div class="overlay">${m.movie_overview}</div>
+        </div>
+        <p><strong>${m.movie_title}</strong></p>
+        <p>평점: ${m.movie_rate}</p>
+        <p>개봉: ${m.movie_release_date}</p>
+      `;
+      div.addEventListener('click', () => {
+        window.location.href = `/movies/${m.movie_id}`;
+      });
+      container.appendChild(div);
+
+    });
+  }
+
+  function loadMoviesAJAX(q, sortOption) {
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    params.append('sortOption', sortOption);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/api/movies?${params}`, true);
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        const movies = JSON.parse(xhr.responseText);
+        allMovies.length = 0;
+        allMovies.push(...movies);
+        filtered = [...allMovies];
+        page = 1;
+        renderPage();
+      }
+    };
+    xhr.send();
+  }
+
+
+
+  function updateView() {
+    const q = input.value.trim();
+    const sortOption = radios.find(r => r.checked).value;
+    loadMoviesAJAX(q, sortOption);
+  }
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateView();
+    button.addEventListener('click', e => { e.preventDefault(); updateView(); });
+    radios.forEach(r => r.addEventListener('change', updateView));
+  });
+</script>
+
+</body>
+</html>
